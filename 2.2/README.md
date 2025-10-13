@@ -1,10 +1,10 @@
-#Name Mangler
+# Name Mangler
 Refactor applying *Clean Code* principles from chapters 3 and 4.
 
-##Code Overview
+## Code Overview
 This refactored version removed global vars, breaks large multifaceted functions into smaller, intentional ones, as well as replacing unnecessary comments with clear naming.
 
-##Reflection Questions
+## Reflection Questions
 
 ### **1. What is the DRY Principle?**
 The DRY Principle stands for *Don't Repeat Yourself.*
