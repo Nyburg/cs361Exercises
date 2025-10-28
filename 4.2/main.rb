@@ -1,23 +1,29 @@
-Create a repository (or a new subdirectory in an existing one) with a README.md and an empty main.rb. Open your empty main.rb in your editor, and take the following code and paste it into your editor.
-
 #-------------------------------------------------------------
 # Exercise 5 Part 1 (Exception Handling)
 #-------------------------------------------------------------
+class ServiceUnavailable < StandardError; end
 
 class MentalState
   def auditable?
-    # true if the external service is online, otherwise false
+    true
   end
   def audit!
-    # Could fail if external service is offline
+    raise ServiceUnavailable, "offline" unless auditable?
+    Struct.new(:ok?).new(true)
   end
   def do_work
     # Amazing stuff...
   end
 end
 
+class MorningMentalState < MentalState
+  def initialize(status = :unknown)
+    @status = status
+  end
+end
+
 def audit_sanity(bedtime_mental_state)
-  return 0 unless bedtime_mental_state.auditable?
+  raise "Service Unavailable" unless bedtime_mental_state.auditable?
   if bedtime_mental_state.audit!.ok?
     MorningMentalState.new(:ok)
   else 
@@ -25,10 +31,11 @@ def audit_sanity(bedtime_mental_state)
   end
 end
 
-if audit_sanity(bedtime_mental_state) == 0
-  puts "error"
-else
+begin
+  bedtime_mental_state = MentalState.new
   new_state = audit_sanity(bedtime_mental_state)
+rescue => e
+  puts "error: #{e.message}"
 end
 
 #-------------------------------------------------------------
@@ -36,8 +43,6 @@ end
 #-------------------------------------------------------------
 
 class BedtimeMentalState < MentalState ; end
-
-class MorningMentalState < MentalState ; end
 
 def audit_sanity(bedtime_mental_state)
   return nil unless bedtime_mental_state.auditable?
@@ -65,4 +70,3 @@ if machine.ready?
 else
   puts "sadness"
 end
-Now, modify the code to reflect the principles from Clean Code, chapters 7 and 8.
