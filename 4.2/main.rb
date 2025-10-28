@@ -8,11 +8,11 @@ class MentalState
     true
   end
   def audit!
-    raise ServiceUnavailable, "offline" unless auditable?
+    raise ServiceUnavailable, "Service Unavailable" unless auditable?
     Struct.new(:ok?).new(true)
   end
   def do_work
-    # Amazing stuff...
+    puts "working with status=#{@status}"
   end
 end
 
@@ -60,13 +60,40 @@ new_state.do_work
 # Exercise 5 Part 3 (Wrapping APIs)
 #-------------------------------------------------------------
 
-require 'candy_service'
 
-machine = CandyMachine.new
-machine.prepare
+begin
+  require 'candy_service'
+rescue LoadError
+  class CandyMachine
+    def prepare; @ready = true; end
+    def ready?;  !!@ready; end
+    def make!;   puts "[Candy] made a treat"; :ok; end
+  end
+end
 
-if machine.ready?
-  machine.make!
-else
-  puts "sadness"
+class CandyMachineWrapper
+  def initialize(machine = CandyMachine.new)
+    @machine = machine
+  end
+
+  def prepare; @machine.prepare; end
+  def ready?;  @machine.ready?; end
+
+  def make!
+    @machine.make!
+  rescue StandardError => e
+    raise "Candy make failed: #{e.message}"
+  end
+end
+
+machine = CandyMachineWrapper.new
+begin
+  machine.prepare
+  if machine.ready?
+    machine.make!
+  else
+    puts "sadness"
+  end
+rescue => e
+  warn "error: #{e.message}"
 end
